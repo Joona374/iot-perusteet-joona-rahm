@@ -4,6 +4,18 @@ const broker = "mqtt://test.mosquitto.org:1883";
 const topicSub = "iot/demo/responses";
 const topicPub = "iot/demo/commands"; // the topic your Pico subscribes to
 
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 4000;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
+
 // Connect to the broker
 const client = mqtt.connect(broker);
 

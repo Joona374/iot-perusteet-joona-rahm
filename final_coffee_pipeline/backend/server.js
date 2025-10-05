@@ -1,15 +1,35 @@
-import express from "express";
-const app = express();
+import mqtt from "mqtt";
 
-app.get("/should_start", (req, res) => {
-  res.set("Connection", "close"); // important for Pico
-  res.set("Transfer-Encoding", "identity"); // disable chunked
-  res.json({ brew: true });
+const broker = "mqtt://test.mosquitto.org:1883";
+const topicSub = "iot/demo/responses";
+const topicPub = "iot/demo/commands"; // the topic your Pico subscribes to
+
+// Connect to the broker
+const client = mqtt.connect(broker);
+
+client.on("connect", () => {
+  console.log(`✅ Connected to ${broker}`);
+
+  // Subscribe to a topic (optional)
+  client.subscribe(topicSub, (err) => {
+    if (err) console.error("❌ Subscribe error:", err);
+    else console.log(`📡 Subscribed to: ${topicSub}`);
+  });
+
+  // Publish a test message every 5 seconds
+  setInterval(() => {
+    const payload = `Hello Pico! ${new Date().toLocaleTimeString()}`;
+    client.publish(topicPub, payload);
+    console.log(`📤 Published to ${topicPub}: ${payload}`);
+  }, 5000);
 });
 
-app.get("/", (req, res) => {
-  res.send("Coffee backend is alive");
+// Handle incoming messages (if you want to see what Pico publishes)
+client.on("message", (topic, message) => {
+  console.log(`📥 ${topic}: ${message.toString()}`);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on", PORT));
+// Optional: handle connection errors
+client.on("error", (err) => {
+  console.error("Broker error:", err);
+});

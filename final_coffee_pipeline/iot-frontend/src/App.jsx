@@ -16,6 +16,8 @@ function App() {
     visible: false,
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // Socket event handlers
   useEffect(() => {
     socket.on("connect", () => {
@@ -68,7 +70,7 @@ function App() {
     setIsSending(true);
     showFeedback(`Brewing ${selectedCups} cups of coffee...`, "success");
     try {
-      const res = await fetch("http://10.85.140.16:4000/brew-now", {
+      const res = await fetch(`${API_URL}/brew-now`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cups: selectedCups }),
@@ -95,7 +97,7 @@ function App() {
 
     setIsSending(true);
     try {
-      const res = await fetch("http://10.85.140.16:4000/set-timer", {
+      const res = await fetch(`${API_URL}/set-timer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ datetime: scheduleTime, cups: selectedCups }),

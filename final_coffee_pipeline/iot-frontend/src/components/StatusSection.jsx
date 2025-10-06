@@ -4,10 +4,12 @@ export default function StatusSection() {
   const [deviceStatus, setDeviceStatus] = useState("Connecting...");
   const [serverStatus, setServerStatus] = useState("Connecting...");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // Fetch system status
   useEffect(() => {
     const fetchStatus = () => {
-      fetch("http://10.85.140.16:4000/status")
+      fetch(`${API_URL}/status`)
         .then((res) => res.json())
         .then((data) => {
           setDeviceStatus(data.device || "Unknown");

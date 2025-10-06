@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 
 export default function Chart({ chartData, setChartData }) {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     // Fetch initial data once
-    fetch("http://10.85.140.16:4000/latest-temps")
+    fetch(`${API_URL}/latest-temps`)
       .then((res) => res.json())
       .then((data) => {
         const newChartData = [

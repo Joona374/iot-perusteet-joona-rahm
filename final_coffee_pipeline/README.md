@@ -10,6 +10,18 @@ Tämä projekti demonstroi yksinkertaista IoT-tietoputkea (“IoT pipeline”), 
 - Laitteen tilasta näytetään tietoa OLED-näytöllä
 - Techstack: Pico W (MicroPython), Node.js/Express, SQLite, Vite, React, Socket.IO, MQTT, Google Graph
 
+## Sisällysluettelo
+
+- [Rakenne](#rakenne)
+- [Järjestelmän kulku](#järjestelmän-kulku)
+- [Pilvessä ajaminen](#pilvessä-ajaminen)
+- [Paikallinen ajaminen](#paikallinen-ajaminen)
+- [Wokwi-simulaattorin käyttö](#wokwi-simulaattorin-käyttö)
+- [Keskeiset toiminnot laitteessa](#keskeiset-toiminnot-laitteessa)
+- [HTTP-rajapinta (backend)](#http-rajapinta-backend)
+- [Tallennus](#tallennus)
+- [Ajatuksia ja jatkokehitystä](#ajatuksia-ja-jatkokehitystä)
+
 ## Rakenne
 
 - Laite (Pico W, MicroPython)
@@ -59,25 +71,6 @@ Tämä projekti demonstroi yksinkertaista IoT-tietoputkea (“IoT pipeline”), 
    - `MAKE_COFFEE_NOW` tai `SET_TIMER`: [`routes.js`](backend/routes.js) → [`mqttClient.sendCommand`](backend/mqttClient.js) / [`mqttClient.sendCoffeeTimerToPico`](backend/mqttClient.js)
 6. Laite ajaa servon ja päivittää tilaa OLED:lle sekä julkaisee statuksen (`STATUS`), jonka backend välittää UI:hin: [`handlers.handleStatus`](backend/handlers.js).
 
-## HTTP-rajapinta (backend)
-
-- GET `/status` — palauttaa palvelimen ja laitteen tilan sekä triggeröi `CHECK_STATUS`: [`server.getStatus`](backend/server.js), [routes.js](backend/routes.js)
-- GET `/latest-temps` — viimeiset 10 min lämpötilat nousevassa aikajärjestyksessä: [routes.js](backend/routes.js)
-- POST `/brew-now` body: `{ "cups": number }` — laskee keston ja lähettää `MAKE_COFFEE_NOW`: [routes.js](backend/routes.js)
-- POST `/set-timer` body: `{ "datetime": isoString, "cups": number }` — säätää aloitusajan ja lähettää `SET_TIMER`: [routes.js](backend/routes.js)
-
-## Käyttö Wokwi-simulaattorilla
-
-##### HUOM!!
-
-Ohjelman toiminta Wokwi simulaattorissa on melko epävakaata. Ajoittain simulaattorin sisäisten verkkovirheiden vuoksi ohjelma ei toimi odotetusti. Suosittelen kokeilemaan koodia oikealla laitteella, jos mahdollista.
-
-- Simulaattori: [https://wokwi.com/](https://wokwi.com/)
-- Tuo [pico/diagram.json](pico/diagram.json) ja muut tiedostot tyhjään Wokwi projektiin.
-- Laite ajaa [pico/main.py](pico/main.py), joka käyttää [`device_controller.DeviceController`](pico/device_controller.py).
-- WLAN-SSID on oletuksena Wokwi-GUEST: [pico/config.py](pico/config.py).
-- MQTT-broker: test.mosquitto.org:1883 (julkinen).
-
 ## Pilvessä ajaminen
 
 Ohjelma on tällä hetkellä julkaistuna:
@@ -101,6 +94,18 @@ Pipelinen toiminta vaatii luonnollisesti myös Pico W laitteen, joka on kytketty
 - Pico (Wokwi)
   - Käynnistä simulaatio; varmista, että backend on käynnissä jos haluat talletuksen ja UI:n päivitykset.
 
+## Wokwi-simulaattorin käyttö
+
+##### HUOM!!
+
+Ohjelman toiminta Wokwi simulaattorissa on melko epävakaata. Ajoittain simulaattorin sisäisten verkkovirheiden vuoksi ohjelma ei toimi odotetusti. Suosittelen kokeilemaan koodia oikealla laitteella, jos mahdollista.
+
+- Simulaattori: [https://wokwi.com/](https://wokwi.com/)
+- Tuo [pico/diagram.json](pico/diagram.json) ja muut tiedostot tyhjään Wokwi projektiin.
+- Laite ajaa [pico/main.py](pico/main.py), joka käyttää [`device_controller.DeviceController`](pico/device_controller.py).
+- WLAN-SSID on oletuksena Wokwi-GUEST: [pico/config.py](pico/config.py).
+- MQTT-broker: test.mosquitto.org:1883 (julkinen).
+
 ## Keskeiset toiminnot laitteessa
 
 - Ajastus ja aika
@@ -108,6 +113,13 @@ Pipelinen toiminta vaatii luonnollisesti myös Pico W laitteen, joka on kytketty
   - Ajastimen asetus tai välitön käynnistys: [`device_controller.DeviceController._set_timer`](pico/device_controller.py), `_make_coffee_now`
 - OLED-tilapäivitykset 5 s välein: [`device_controller.DeviceController.update_oled_if_needed`](pico/device_controller.py)
 - MQTT-yhteyden ylläpito ja ping: [`dyiumqtt.MQTTClient.loop`](pico/dyiumqtt.py), [`device_controller.DeviceController.ping_mqtt_if_needed`](pico/device_controller.py)
+
+## HTTP-rajapinta (backend)
+
+- GET `/status` — palauttaa palvelimen ja laitteen tilan sekä triggeröi `CHECK_STATUS`: [`server.getStatus`](backend/server.js), [routes.js](backend/routes.js)
+- GET `/latest-temps` — viimeiset 10 min lämpötilat nousevassa aikajärjestyksessä: [routes.js](backend/routes.js)
+- POST `/brew-now` body: `{ "cups": number }` — laskee keston ja lähettää `MAKE_COFFEE_NOW`: [routes.js](backend/routes.js)
+- POST `/set-timer` body: `{ "datetime": isoString, "cups": number }` — säätää aloitusajan ja lähettää `SET_TIMER`: [routes.js](backend/routes.js)
 
 ## Tallennus
 
